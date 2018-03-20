@@ -6,12 +6,12 @@ var plumber = require("gulp-plumber");
 var postcss = require("gulp-postcss");
 var autoprefixer = require("autoprefixer");
 var server = require("browser-sync").create();
-//var minify = require("gulp-csso");
+var minify = require("gulp-csso");
 var rename = require("gulp-rename");
-//var imagemin = require("gulp-imagemin");
+var imagemin = require("gulp-imagemin");
 var del = require("del");
 var run = require("run-sequence");
-//var uglify = require("gulp-uglify");
+var uglify = require("gulp-uglify");
 var pump = require("pump");
 var csscomb = require("gulp-csscomb");
 
@@ -36,9 +36,10 @@ gulp.task("style", function() {
   gulp.src("sass/style.scss")
     .pipe(plumber())
     .pipe(sass({
-            includePaths: require('node-normalize-scss').includePaths
-          }))
-//    .pipe(sass())
+      // includePaths: require('node-normalize-scss').with('other/path', 'another/path')
+      // - or -
+      includePaths: require('node-normalize-scss').includePaths
+    }))
     .pipe(postcss([
       autoprefixer({browsers: [
         "last 2 versions"
@@ -46,40 +47,38 @@ gulp.task("style", function() {
     ]))
     .pipe(csscomb())
     .pipe(gulp.dest("build/css"))
-//.pipe(minify())
-//    .pipe(rename("style.min.css"))
-//   .pipe(gulp.dest("build/css"))
+    .pipe(minify())
+    .pipe(rename("style.min.css"))
+    .pipe(gulp.dest("build/css"))
 
     .pipe(server.stream());
 });
 
-//gulp.task("images", function(){
-//  return gulp.src("build/img/**/*.{png,jpg,gif}")
-/*  .pipe(imagemin([
+gulp.task("images", function(){
+  return gulp.src("build/img/**/*.{png,jpg,gif}")
+  .pipe(imagemin([
     imagemin.optipng({optimizationLevel: 3}),
     imagemin.jpegtran({progressive: true})
   ]))
   .pipe(gulp.dest("build/img"));
 });
-*/
 
-//gulp.task("compress", function(cb){
-//  pump([
-//    gulp.src("build/js/**/*.js"),
-/*    uglify(),
+gulp.task("compress", function(cb){
+  pump([
+    gulp.src("build/js/**/*.js"),
+    uglify(),
     gulp.dest("build/js-mini")
     ],
     cb
     );
 });
-*/
 
 gulp.task("build", function(fn) {
   run("clean",
       "copy",
       "style",
-//      "images",
-//      "compress",
+      "images",
+      "compress",
       fn);
 });
 
